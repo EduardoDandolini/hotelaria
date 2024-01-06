@@ -1,5 +1,6 @@
 package com.eduardo.hotelaria.entity;
 
+import com.eduardo.hotelaria.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,5 +34,13 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
+
+    public User(String name, String password, Set<Role> roles) {
+
+    }
+
+    public UserDTO toDTO() {
+        return new UserDTO(id, name, password, roles);
+    }
 
 }

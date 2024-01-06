@@ -12,12 +12,12 @@ import java.util.List;
 
 @Repository
 public interface ReserveRepository extends JpaRepository<Reserve, Long> {
-    @Query("SELECT h " +
-            "FROM tb_hotels t " +
-            "where t.name = :nameHotel")
+    @Query("SELECT reserve " +
+            "FROM tb_reserves reserve " +
+            "where reserve.hotel.name = :nameHotel")
     List<Hotel> findReserveByNameHotel(@Param("nameHotel") String nameHotel);
-    @Query("SELECT u " +
-            "FROM tb_users u " +
-            "where u.name = :userName")
+    @Query("SELECT reserve " +
+            "FROM tb_reserves reserve " +
+            "where reserve.hotel.name = :userName")
     List<User> findReserveByUserName(@Param("userName") String userName);
 }
