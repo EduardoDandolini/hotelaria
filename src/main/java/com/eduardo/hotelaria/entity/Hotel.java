@@ -1,5 +1,7 @@
 package com.eduardo.hotelaria.entity;
 
+import com.eduardo.hotelaria.dto.HotelDTO;
+import com.eduardo.hotelaria.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,4 +34,15 @@ public class Hotel {
     private Long numberRooms;
 
     private List<String> amenities;
+
+    public Hotel(String name, String location, Long numberRooms, List<String> amenities) {
+        this.name = name;
+        this.location = location;
+        this.numberRooms = numberRooms;
+        this.amenities = amenities;
+    }
+
+    public HotelDTO toDTO() {
+        return new HotelDTO(id, name, location, numberRooms, amenities);
+    }
 }

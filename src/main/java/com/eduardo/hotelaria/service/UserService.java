@@ -5,6 +5,7 @@ import com.eduardo.hotelaria.entity.User;
 import com.eduardo.hotelaria.exception.NotFoundException;
 import com.eduardo.hotelaria.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

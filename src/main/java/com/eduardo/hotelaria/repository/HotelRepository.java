@@ -7,11 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, Long> {
     @Query("SELECT h " +
             "from tb_hotels h " +
             "where h.name = :name")
-    List<Hotel> findHotelByName(@Param("name") String name);
+    Optional<Hotel> findHotelByName(@Param("name") String name);
 }
