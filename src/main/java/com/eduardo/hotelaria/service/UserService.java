@@ -18,7 +18,6 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    @Transactional(readOnly = true)
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         if (!users.isEmpty()) {
@@ -29,7 +28,6 @@ public class UserService {
             throw new NotFoundException("No users found");
         }
     }
-    @Transactional(readOnly = true)
     public Optional<UserDTO> getUserById(Long id) {
         return userRepository.findById(id)
                 .map(User::toDTO);
@@ -50,18 +48,13 @@ public class UserService {
     }
     @Transactional(rollbackFor = Exception.class)
     public UserDTO updateUser(Long id, UserDTO dto) {
-        Optional<User> optionalUser = userRepository.findById(id);
-
-        if (optionalUser.isPresent()){
-            User existingUser = optionalUser.get();
-            existingUser.setName(dto.getName());
-            existingUser.setPassword(dto.getPassword());
-            existingUser.setRoles(dto.getRoles());
-
-            User newUser = userRepository.save(existingUser);
-            return newUser.toDTO();
-        } else {
-            throw new NotFoundException("User with id: " + id + "not found");
-        }
+        return userRepository.findById(id)
+                .map(existingUser -> {
+                    existingUser.setName(dto.getName());
+                    existingUser.setPassword(dto.getPassword());
+                    existingUser.setRoles(dto.getRoles());
+                    return userRepository.save(existingUser).toDTO();
+                })
+                .orElseThrow(() -> new NotFoundException("User with id: " + id + " not found"));
     }
 }

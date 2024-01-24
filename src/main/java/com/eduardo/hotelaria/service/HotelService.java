@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -24,10 +25,9 @@ import java.util.stream.Collectors;
 public class HotelService {
     @Autowired
     HotelRepository hotelRepository;
-    @Transactional(readOnly = true)
     public List<HotelDTO> getAllHotels() {
         List<Hotel> hoteis = hotelRepository.findAll();
-            if (!hoteis.isEmpty()){
+            if (CollectionUtils.isEmpty(hoteis)){
                 return hoteis.stream()
                         .map(Hotel::toDTO)
                         .collect(Collectors.toList());
@@ -35,7 +35,6 @@ public class HotelService {
                 throw new NotFoundException("No hotel found");
             }
     }
-    @Transactional(readOnly = true)
     public Optional<HotelDTO> getHotelByName(@Valid HotelDTO dto) {
         return hotelRepository.findHotelByName(dto.getName())
                 .map(Hotel::toDTO);
@@ -52,6 +51,27 @@ public class HotelService {
             throw new UnauthorizedAccessException("User does not have permission to create a new hotel");
         }
     }
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteHotel(Long id){
+        if (hotelRepository.existsById(id)){
+            hotelRepository.deleteById(id);
+        } else {
+            throw new NotFoundException("Hotel with id: " + id + " does not exist");
+        }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public HotelDTO updateHotel(Long id, HotelDTO dto){
+        return hotelRepository.findById(id)
+                .map(existingHotel -> {
+                    existingHotel.setName(dto.getName());
+                    existingHotel.setLocation(dto.getLocation());
+                    existingHotel.setNumberRooms(dto.getNumberRooms());
+                    existingHotel.setAmenities(dto.getAmenities());
+                    return hotelRepository.save(existingHotel).toDTO();
+                })
+                .orElseThrow(() -> new NotFoundException("Hotel with id: " + id + " not found"));
+    }
+
     private boolean isAdmin(Authentication authentication) {
         return SecurityUtils.hasRole(authentication, Role.ROLE_ADMIN);
     }
